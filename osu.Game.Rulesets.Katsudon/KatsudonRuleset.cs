@@ -96,6 +96,11 @@ namespace osu.Game.Rulesets.Katsudon
             return new KatsudonFilterCriteria();
         }
 
+        public override IRulesetConvertSupport GetRulesetMapConvertSupport()
+        {
+            return new KatsudonConvertSupport();
+        }
+
         public override string Description => "katsudon";
 
         public override string PlayingVerb => "Bashing drums";
