@@ -33,9 +33,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects
         {
             var ret = obj switch
             {
-                osu.Game.Rulesets.Taiko.Objects.BarLine barline => BarLine.Convert(barline, playerNo),
                 osu.Game.Rulesets.Taiko.Objects.DrumRoll drumroll => DrumRoll.Convert(drumroll, playerNo),
-                osu.Game.Rulesets.Taiko.Objects.DrumRollTick drumroll => DrumRollTick.Convert(drumroll, playerNo),
                 osu.Game.Rulesets.Taiko.Objects.IgnoreHit ignoreHit => IgnoreHit.Convert(ignoreHit, playerNo),
                 osu.Game.Rulesets.Taiko.Objects.Hit hit => Hit.Convert(hit, playerNo),
                 _ => throw new NotImplementedException("conversion from type " + obj.GetType() + " not implemented")
@@ -46,6 +44,18 @@ namespace osu.Game.Rulesets.Katsudon.Objects
                 if (parent != null)
                     nested.Parent = Convert(parent, playerNo);
             }
+            return ret;
+        }
+
+        public static Taiko.Objects.TaikoHitObject Unconvert(KatsudonHitObject obj)
+        {
+            var ret = obj switch
+            {
+                DrumRoll drumroll => DrumRoll.Unconvert(drumroll),
+                IgnoreHit ignoreHit => IgnoreHit.Unconvert(ignoreHit),
+                Hit hit => Hit.Unconvert(hit),
+                _ => throw new NotImplementedException("conversion from type " + obj.GetType() + " not implemented")
+            };
             return ret;
         }
     }

@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Katsudon.Skinning.Legacy;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Katsudon.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.Katsudon.Difficulty;
 
 namespace osu.Game.Rulesets.Katsudon
 {
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Katsudon
             => new KatsudonBeatmapConverter(getTaikoRuleset().CreateBeatmapConverter(beatmap), beatmap, this);
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
-            => getTaikoRuleset().CreateDifficultyCalculator(beatmap);
+            => new KatsudonDifficultyCalculator(RulesetInfo, beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
             => getTaikoRuleset().GetModsFor(type);

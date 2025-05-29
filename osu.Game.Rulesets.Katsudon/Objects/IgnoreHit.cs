@@ -21,6 +21,17 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             };
         }
 
+        public static Taiko.Objects.IgnoreHit Unconvert(IgnoreHit ignoreHit, int playerId)
+        {
+            return new Taiko.Objects.IgnoreHit
+            {
+                HitWindows = ignoreHit.HitWindows,
+                Samples = ignoreHit.Samples,
+                StartTime = ignoreHit.StartTime,
+                IsStrong = ignoreHit.IsStrong
+            };
+        }
+
         public override Judgement CreateJudgement() => new IgnoreJudgement();
     }
 }

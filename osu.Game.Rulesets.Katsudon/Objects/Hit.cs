@@ -91,6 +91,18 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             };
         }
 
+        public static Taiko.Objects.TaikoHitObject Unconvert(Hit hit)
+        {
+            return new Taiko.Objects.Hit
+            {
+                HitWindows = hit.HitWindows,
+                Samples = hit.Samples,
+                StartTime = hit.StartTime,
+                IsStrong = hit.IsStrong,
+                Type = hit.Type
+            };
+        }
+
         public class StrongNestedHit : StrongNestedHitObject
         {
             public StrongNestedHit(KatsudonHitObject parent)

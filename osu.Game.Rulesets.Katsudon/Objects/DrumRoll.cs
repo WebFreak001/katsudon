@@ -124,6 +124,21 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             return ret;
         }
 
+        public static Taiko.Objects.TaikoHitObject Unconvert(DrumRoll drumRoll)
+        {
+            var ret = new Taiko.Objects.DrumRoll
+            {
+                HitWindows = drumRoll.HitWindows,
+                Samples = drumRoll.Samples,
+                StartTime = drumRoll.StartTime,
+                Duration = drumRoll.Duration,
+                TickRate = drumRoll.TickRate,
+                IsStrong = drumRoll.IsStrong,
+            };
+
+            return ret;
+        }
+
         public class StrongNestedHit : StrongNestedHitObject
         {
             // The strong hit of the drum roll doesn't actually provide any score.
