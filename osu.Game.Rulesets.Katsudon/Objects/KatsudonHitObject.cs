@@ -54,7 +54,8 @@ namespace osu.Game.Rulesets.Katsudon.Objects
                 DrumRoll drumroll => DrumRoll.Unconvert(drumroll),
                 IgnoreHit ignoreHit => IgnoreHit.Unconvert(ignoreHit),
                 Hit hit => Hit.Unconvert(hit),
-                _ => throw new NotImplementedException("conversion from type " + obj.GetType() + " not implemented")
+                Swell swell => Swell.Unconvert(swell),
+                _ => throw new NotImplementedException("unconversion from type " + obj.GetType() + " not implemented")
             };
             return ret;
         }

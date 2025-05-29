@@ -58,5 +58,17 @@ namespace osu.Game.Rulesets.Katsudon.Objects
                 PlayerId = -1
             };
         }
+
+        public static Taiko.Objects.TaikoHitObject Unconvert(Swell swell)
+        {
+            return new Taiko.Objects.Swell
+            {
+                HitWindows = swell.HitWindows,
+                Samples = swell.Samples,
+                StartTime = swell.StartTime,
+                Duration = swell.Duration,
+                RequiredHits = (int)Math.Round(swell.RequiredHits * 2.5),
+            };
+        }
     }
 }
