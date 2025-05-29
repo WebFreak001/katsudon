@@ -96,23 +96,23 @@ namespace osu.Game.Rulesets.Katsudon.UI
                     Name = "Player 1 scoring",
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.TopCentre,
-                    Margin = new MarginPadding { Bottom = 100 },
+                    RelativeAnchorPosition = new osuTK.Vector2(0.25f, 0),
+                    Margin = new MarginPadding { Bottom = 132 },
                     Children = new Drawable[]
                     {
                         new DefaultComboCounter
                         {
                             Name = "P1 Combo",
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.X,
                             Margin = new MarginPadding { Left = 330, Top = 15 },
                         },
                         new DefaultScoreCounter
                         {
                             Name = "P1 Score",
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.X,
                         },
                     }
@@ -122,23 +122,23 @@ namespace osu.Game.Rulesets.Katsudon.UI
                     Name = "Player 2 scoring",
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.TopCentre,
-                    Anchor = Anchor.BottomCentre,
+                    RelativeAnchorPosition = new osuTK.Vector2(0.25f, 1),
                     Margin = new MarginPadding { Top = 100 },
                     Children = new Drawable[]
                     {
                         new DefaultComboCounter
                         {
                             Name = "P2 Combo",
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
+                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.BottomCentre,
                             AutoSizeAxes = Axes.X,
                             Margin = new MarginPadding { Left = 330, Top = 15 },
                         },
                         new DefaultScoreCounter
                         {
                             Name = "P2 Score",
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
+                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.BottomCentre,
                             AutoSizeAxes = Axes.X,
                         },
                     },

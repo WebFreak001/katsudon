@@ -20,7 +20,10 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
                 {
                     Colour = Color4.Black,
                     Alpha = 0.7f,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
+                    Height = 2,
                 },
             };
         }
