@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
 {
     public partial class ArgonHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
-        private readonly TaikoSkinComponents component;
+        private readonly KatsudonSkinComponents component;
 
         private readonly Circle outer;
         private readonly Circle inner;
 
-        public ArgonHitExplosion(TaikoSkinComponents component)
+        public ArgonHitExplosion(KatsudonSkinComponents component)
         {
             this.component = component;
 
@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
 
             switch (component)
             {
-                case TaikoSkinComponents.TaikoExplosionGreat:
+                case KatsudonSkinComponents.KatsudonExplosionGreat:
                     this.FadeIn(30, Easing.In)
                         .Then()
                         .FadeOut(450, Easing.OutQuint);
                     break;
 
-                case TaikoSkinComponents.TaikoExplosionOk:
+                case KatsudonSkinComponents.KatsudonExplosionOk:
                     this.FadeTo(0.2f, 30, Easing.In)
                         .Then()
                         .FadeOut(200, Easing.OutQuint);

@@ -44,13 +44,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             isStrong.UnbindEvents();
         }
 
-        protected override void RecreatePieces()
-        {
-            base.RecreatePieces();
-            if (HitObject.IsStrong)
-                Size = BaseSize = new Vector2(KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE);
-        }
-
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
             base.AddNestedHitObject(hitObject);

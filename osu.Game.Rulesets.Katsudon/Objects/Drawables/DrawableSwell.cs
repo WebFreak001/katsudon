@@ -6,40 +6,34 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Taiko.Skinning.Default;
-using osu.Game.Skinning;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Screens.Play;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 {
     public partial class DrawableSwell : DrawableKatsudonHitObject<Swell>
     {
-        private const float target_ring_thick_border = 1.4f;
-        private const float target_ring_thin_border = 1f;
-        private const float target_ring_scale = 5f;
-        private const float inner_ring_alpha = 0.65f;
-
         /// <summary>
         /// Offset away from the start time of the swell at which the ring starts appearing.
         /// </summary>
         private const double ring_appear_offset = 100;
 
+        private Vector2 baseSize;
+
         private readonly Container<DrawableSwellTick> ticks;
-        private readonly Container bodyContainer;
-        private readonly CircularContainer targetRing;
-        private readonly CircularContainer expandingRing;
+
+        private double?[] lastPressHandleTime = new double?[2];
 
         public override bool DisplayResult => false;
+
+        public event Action<int> UpdateHitProgress;
 
         public DrawableSwell()
             : this(null)
@@ -51,88 +45,22 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            Content.Add(bodyContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = 1,
-                Children = new Drawable[]
-                {
-                    expandingRing = new CircularContainer
-                    {
-                        Name = "Expanding ring",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Alpha = 0,
-                        RelativeSizeAxes = Axes.Both,
-                        Blending = BlendingParameters.Additive,
-                        Masking = true,
-                        Children = new[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = inner_ring_alpha,
-                            }
-                        }
-                    },
-                    targetRing = new CircularContainer
-                    {
-                        Name = "Target ring (thick border)",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderThickness = target_ring_thick_border,
-                        Blending = BlendingParameters.Additive,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                AlwaysPresent = true
-                            },
-                            new CircularContainer
-                            {
-                                Name = "Target ring (thin border)",
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                BorderThickness = target_ring_thin_border,
-                                BorderColour = Color4.White,
-                                Children = new[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Alpha = 0,
-                                        AlwaysPresent = true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
             AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            expandingRing.Colour = colours.YellowLight;
-            targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
-        }
-
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Swell),
-            _ => new SwellCirclePiece
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new KatsudonSkinComponentLookup(HitObject.PlayerId, KatsudonSkinComponents.Swell),
+            _ => new Skinning.Default.DefaultSwell
             {
-                // to allow for rotation transform
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
             });
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = baseSize = new Vector2(KatsudonHitObject.DEFAULT_SIZE);
+        }
 
         protected override void OnFree()
         {
@@ -140,8 +68,10 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 
             UnproxyContent();
 
-            lastWasCentre[0] = null;
-            lastWasCentre[1] = null;
+            lastAction[0] = null;
+            lastAction[1] = null;
+            lastPressHandleTime[0] = null;
+            lastPressHandleTime[1] = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -192,19 +122,10 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 
                 int numHits = ticks.Count(r => r.IsHit);
 
-                float completion = (float)numHits / HitObject.RequiredHits;
-
-                expandingRing
-                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
-                    .Then()
-                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
-
-                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
-
-                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
+                UpdateHitProgress?.Invoke(numHits);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
             else
             {
@@ -225,32 +146,28 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits == HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                if (numHits == HitObject.RequiredHits)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
-        }
-
-        protected override void UpdateStartTimeStateTransforms()
-        {
-            base.UpdateStartTimeStateTransforms();
-
-            using (BeginDelayedSequence(-ring_appear_offset))
-                targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            const double transition_duration = 300;
+            base.UpdateHitStateTransforms(state);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    expandingRing.FadeTo(0);
                     break;
 
                 case ArmedState.Miss:
+                    this.Delay(300).FadeOut();
+                    break;
+
                 case ArmedState.Hit:
-                    this.FadeOut(transition_duration, Easing.Out);
-                    bodyContainer.ScaleTo(1.4f, transition_duration);
+                    this.Delay(660).FadeOut();
                     break;
             }
         }
@@ -259,7 +176,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
         {
             base.Update();
 
-            Size = BaseSize * Parent.RelativeChildSize;
+            Size = baseSize * Parent!.RelativeChildSize;
 
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
@@ -268,9 +185,14 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
                 ProxyContent();
             else
                 UnproxyContent();
+
+            if ((Clock as IGameplayClock)?.IsRewinding == true) {
+                lastPressHandleTime[0] = null;
+                lastPressHandleTime[1] = null;
+            }
         }
 
-        private bool?[] lastWasCentre = new bool?[2];
+        private KatsudonAction?[] lastAction = new KatsudonAction?[2];
 
         public override bool OnPressed(KeyBindingPressEvent<KatsudonAction> e)
         {
@@ -278,16 +200,21 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            // both players can use swells
-            bool isCentre =
-                   e.Action == KatsudonAction.P1_LeftCentre || e.Action == KatsudonAction.P1_RightCentre
-                || e.Action == KatsudonAction.P2_LeftCentre || e.Action == KatsudonAction.P2_RightCentre;
-
-            // Ensure alternating centre and rim hits
-            if (lastWasCentre[e.Action.GetPlayerNo()] == isCentre)
+            if (AllJudged)
                 return false;
 
-            lastWasCentre[e.Action.GetPlayerNo()] = isCentre;
+            // Ensure hitting alternate buttons
+            if (lastAction[e.Action.GetPlayerNo()] == e.Action)
+                return false;
+
+            // If we've already successfully judged a tick this frame, do not judge more.
+            // Note that the ordering is important here - this is intentionally placed after the alternating check.
+            // That is done to prevent accidental double inputs blocking simultaneous but legitimate hits from registering.
+            if (lastPressHandleTime[e.Action.GetPlayerNo()] == Time.Current)
+                return true;
+
+            lastAction[e.Action.GetPlayerNo()] = e.Action;
+            lastPressHandleTime[e.Action.GetPlayerNo()] = Time.Current;
 
             UpdateResult(true);
 

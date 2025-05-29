@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Katsudon.Objects
 {
     public class DrumRollTick : KatsudonStrongableHitObject
     {
+        public readonly DrumRoll Parent;
+
         /// <summary>
         /// Whether this is the first (initial) tick of the slider.
         /// </summary>
@@ -28,6 +30,11 @@ namespace osu.Game.Rulesets.Katsudon.Objects
         /// </summary>
         public double HitWindow => TickSpacing / 2;
 
+        public DrumRollTick(DrumRoll parent)
+        {
+            Parent = parent;
+        }
+
         public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
@@ -40,12 +47,11 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             Samples = Samples
         };
 
-        public static KatsudonHitObject Convert(Taiko.Objects.DrumRollTick drumRollTick, int playerId)
+        public static KatsudonHitObject Convert(DrumRoll parent, Taiko.Objects.DrumRollTick drumRollTick, int playerId)
         {
-            return new DrumRollTick
+            return new DrumRollTick(parent)
             {
                 HitWindows = drumRollTick.HitWindows,
-                LegacyBpmMultiplier = drumRollTick.LegacyBpmMultiplier,
                 Samples = drumRollTick.Samples,
                 StartTime = drumRollTick.StartTime,
                 IsStrong = drumRollTick.IsStrong,

@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Katsudon.Objects
@@ -15,7 +14,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             return new IgnoreHit
             {
                 HitWindows = ignoreHit.HitWindows,
-                LegacyBpmMultiplier = ignoreHit.LegacyBpmMultiplier,
                 Samples = ignoreHit.Samples,
                 StartTime = ignoreHit.StartTime,
                 IsStrong = ignoreHit.IsStrong,

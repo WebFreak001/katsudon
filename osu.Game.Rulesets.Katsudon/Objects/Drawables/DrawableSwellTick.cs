@@ -26,12 +26,14 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
         {
         }
 
-        protected override void UpdateInitialTransforms() => this.FadeOut();
-
         public void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+
+            if (hit)
+                ApplyMaxResult();
+            else
+                ApplyMinResult();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -40,7 +42,8 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<KatsudonAction> e) => false;
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick),
+        // protected override SkinnableDrawable CreateMainPiece() => null;
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new KatsudonSkinComponentLookup(HitObject.PlayerId, KatsudonSkinComponents.DrumRollTick),
             _ => new TickPiece());
     }
 }

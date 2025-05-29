@@ -35,30 +35,26 @@ namespace osu.Game.Rulesets.Katsudon
         public const string SHORT_NAME = "katsudon";
 
         private TaikoRuleset? subRuleset = null;
-        private TaikoRuleset GetTaikoRuleset()
+        private TaikoRuleset getTaikoRuleset()
         {
-            if (subRuleset == null)
-                subRuleset = new TaikoRuleset();
-
-            return subRuleset;
+            return subRuleset ??= new TaikoRuleset();
         }
 
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             => new DrawableKatsudonRuleset(this, beatmap, mods);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap)
-            => new KatsudonBeatmapConverter(GetTaikoRuleset().CreateBeatmapConverter(beatmap), beatmap, this);
+            => new KatsudonBeatmapConverter(getTaikoRuleset().CreateBeatmapConverter(beatmap), beatmap, this);
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
-            => GetTaikoRuleset().CreateDifficultyCalculator(beatmap);
+            => getTaikoRuleset().CreateDifficultyCalculator(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
-            => GetTaikoRuleset().GetModsFor(type);
+            => getTaikoRuleset().GetModsFor(type);
 
         public override string ShortName => SHORT_NAME;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
-        {
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => [
             new KeyBinding(InputKey.Q, KatsudonAction.P1_LeftRim),
             new KeyBinding(InputKey.A, KatsudonAction.P1_LeftCentre),
             new KeyBinding(InputKey.X, KatsudonAction.P1_RightCentre),
@@ -68,7 +64,7 @@ namespace osu.Game.Rulesets.Katsudon
             new KeyBinding(InputKey.Period, KatsudonAction.P2_LeftCentre),
             new KeyBinding(InputKey.Quote, KatsudonAction.P2_RightCentre),
             new KeyBinding(InputKey.BracketRight, KatsudonAction.P2_RightRim),
-        };
+        ];
 
         public override Drawable CreateIcon() => new KatsudonRulesetIcon(this);
 
@@ -93,14 +89,12 @@ namespace osu.Game.Rulesets.Katsudon
         }
 
         public override PerformanceCalculator CreatePerformanceCalculator()
-            => GetTaikoRuleset().CreatePerformanceCalculator();
+            => getTaikoRuleset().CreatePerformanceCalculator();
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {
             return new KatsudonFilterCriteria();
         }
-
-        public override int ConversionSourceRulesetID => 1;
 
         public override string Description => "katsudon";
 
@@ -112,28 +106,18 @@ namespace osu.Game.Rulesets.Katsudon
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {
-            return new[]
-            {
+            return [
                 HitResult.Great,
                 HitResult.Ok,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
-            };
+            ];
         }
 
         public override LocalisableString GetDisplayNameForHitResult(HitResult result)
         {
-            switch (result)
-            {
-                case HitResult.SmallBonus:
-                    return "drum tick";
-
-                case HitResult.LargeBonus:
-                    return "bonus";
-            }
-
-            return base.GetDisplayNameForHitResult(result);
+            return getTaikoRuleset().GetDisplayNameForHitResult(result);
         }
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
@@ -141,8 +125,7 @@ namespace osu.Game.Rulesets.Katsudon
             var timedHitEventsP1 = score.HitEvents.Where(e => e.HitObject is Hit h && h.IsPlayer1).ToList();
             var timedHitEventsP2 = score.HitEvents.Where(e => e.HitObject is Hit h && h.IsPlayer2).ToList();
 
-            return new[]
-            {
+            return [
                 new StatisticItem("P1 Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
@@ -173,7 +156,7 @@ namespace osu.Game.Rulesets.Katsudon
                     new AverageHitError(timedHitEventsP2),
                     new UnstableRate(timedHitEventsP2)
                 }), true),
-            };
+            ];
         }
     }
 }

@@ -26,19 +26,10 @@ namespace osu.Game.Rulesets.Katsudon.UI
 
             Children = new Drawable[]
             {
-                new Box
-                {
-                    Name = "Bar Upper",
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(border_thickness, (1 - KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
-                    Alpha = 0.1f
-                },
                 new CircularContainer
                 {
-                    Name = "Strong Hit Ring",
-                    Anchor = Anchor.Centre,
+                    Name = "Upper Strong Hit Ring",
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE),
@@ -58,8 +49,50 @@ namespace osu.Game.Rulesets.Katsudon.UI
                 },
                 new CircularContainer
                 {
-                    Name = "Normal Hit Ring",
-                    Anchor = Anchor.Centre,
+                    Name = "Upper Normal Hit Ring",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE),
+                    Masking = true,
+                    BorderColour = Color4.White,
+                    BorderThickness = border_thickness,
+                    Alpha = 0.5f,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                },
+                new CircularContainer
+                {
+                    Name = "Lower Strong Hit Ring",
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE),
+                    Masking = true,
+                    BorderColour = Color4.White,
+                    BorderThickness = border_thickness,
+                    Alpha = 0.1f,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                },
+                new CircularContainer
+                {
+                    Name = "Lower Normal Hit Ring",
+                    Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE),
@@ -79,9 +112,9 @@ namespace osu.Game.Rulesets.Katsudon.UI
                 },
                 new Box
                 {
-                    Name = "Bar Lower",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Name = "Bar center",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(border_thickness, (1 - KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
                     Alpha = 0.1f

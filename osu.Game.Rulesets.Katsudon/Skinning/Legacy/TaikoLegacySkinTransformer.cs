@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
@@ -25,82 +25,87 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
         public KatsudonLegacySkinTransformer(ISkin skin)
             : base(skin)
         {
-            hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
+            hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(KatsudonSkinComponents.KatsudonExplosionGreat)) != null);
         }
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GameplaySkinComponentLookup<HitResult>)
+            if (lookup is SkinComponentLookup<HitResult>)
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
                     return Drawable.Empty().With(d => d.Expire());
             }
 
-            if (lookup is TaikoSkinComponentLookup taikoComponent)
+            if (lookup is KatsudonSkinComponentLookup taikoComponent)
             {
                 switch (taikoComponent.Component)
                 {
-                    case TaikoSkinComponents.DrumRollBody:
+                    case KatsudonSkinComponents.DrumRollBody:
                         if (GetTexture("taiko-roll-middle") != null)
                             return new LegacyDrumRoll();
 
                         return null;
 
-                    case TaikoSkinComponents.InputDrum:
+                    case KatsudonSkinComponents.InputDrum:
                         if (hasBarLeft)
                             return new LegacyInputDrum();
 
                         return null;
 
-                    case TaikoSkinComponents.CentreHit:
-                    case TaikoSkinComponents.RimHit:
+                    case KatsudonSkinComponents.DrumSamplePlayer:
+                        return null;
+
+                    case KatsudonSkinComponents.CentreHit:
+                    case KatsudonSkinComponents.RimHit:
                         if (hasHitCircle)
                             return new LegacyHit(taikoComponent.Component);
 
                         return null;
 
-                    case TaikoSkinComponents.DrumRollTick:
+                    case KatsudonSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
-                    case TaikoSkinComponents.Swell:
-                        // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
+                    case KatsudonSkinComponents.Swell:
+                        if (GetTexture("spinner-circle") != null)
+                            return new LegacySwell();
+
                         return null;
 
-                    case TaikoSkinComponents.HitTarget:
+                    case KatsudonSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
                             return new KatsudonLegacyHitTarget();
 
                         return null;
 
-                    case TaikoSkinComponents.PlayfieldBackgroundRight:
+                    case KatsudonSkinComponents.PlayfieldBackgroundRight:
                         if (GetTexture("taiko-bar-right") != null)
                             return new KatsudonLegacyPlayfieldBackgroundRight();
 
                         return null;
 
-                    case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                    case KatsudonSkinComponents.PlayfieldBackgroundLeft:
                         // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
                         if (GetTexture("taiko-bar-right") != null)
                             return Drawable.Empty();
 
                         return null;
 
-                    case TaikoSkinComponents.BarLine:
+                    case KatsudonSkinComponents.BarLine:
                         if (GetTexture("taiko-barline") != null)
                             return new LegacyBarLine();
 
                         return null;
 
-                    case TaikoSkinComponents.TaikoExplosionMiss:
+                    case KatsudonSkinComponents.KatsudonExplosionMiss:
                         var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
                         if (missSprite != null)
                             return new LegacyHitExplosion(missSprite);
 
                         return null;
 
-                    case TaikoSkinComponents.TaikoExplosionOk:
-                    case TaikoSkinComponents.TaikoExplosionGreat:
+                    case KatsudonSkinComponents.KatsudonExplosionOk:
+                    case KatsudonSkinComponents.KatsudonExplosionGreat:
                         string hitName = getHitName(taikoComponent.Component);
                         var hitSprite = this.GetAnimation(hitName, true, false);
 
@@ -113,7 +118,7 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
 
                         return null;
 
-                    case TaikoSkinComponents.TaikoExplosionKiai:
+                    case KatsudonSkinComponents.KatsudonExplosionKiai:
                         // suppress the default kiai explosion if the skin brings its own sprites.
                         // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                         if (hasExplosion.Value)
@@ -121,25 +126,22 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
 
                         return null;
 
-                    case TaikoSkinComponents.Scroller:
+                    case KatsudonSkinComponents.Scroller:
                         if (GetTexture("taiko-slider") != null)
                             return new LegacyKatsudonScroller();
 
                         return null;
 
-                    // TODO
-                    case TaikoSkinComponents.Mascot:
-                        // return new DrawableTaikoMascot();
-                        return null;
+                    case KatsudonSkinComponents.Mascot:
+                        return new DrawableTaikoMascot();
 
-                    case TaikoSkinComponents.KiaiGlow:
+                    case KatsudonSkinComponents.KiaiGlow:
                         if (GetTexture("taiko-glow") != null)
                             return new LegacyKiaiGlow();
 
                         return null;
 
                     default:
-                        Logger.Log($"failed attempted skin load of component {taikoComponent.Component}");
                         throw new UnsupportedSkinComponentException(lookup);
                 }
             }
@@ -147,17 +149,17 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
             return base.GetDrawableComponent(lookup);
         }
 
-        private string getHitName(TaikoSkinComponents component)
+        private string getHitName(KatsudonSkinComponents component)
         {
             switch (component)
             {
-                case TaikoSkinComponents.TaikoExplosionMiss:
+                case KatsudonSkinComponents.KatsudonExplosionMiss:
                     return "taiko-hit0";
 
-                case TaikoSkinComponents.TaikoExplosionOk:
+                case KatsudonSkinComponents.KatsudonExplosionOk:
                     return "taiko-hit100";
 
-                case TaikoSkinComponents.TaikoExplosionGreat:
+                case KatsudonSkinComponents.KatsudonExplosionGreat:
                     return "taiko-hit300";
             }
 

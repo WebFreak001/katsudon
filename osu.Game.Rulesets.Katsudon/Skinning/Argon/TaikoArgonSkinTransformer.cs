@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
@@ -15,65 +14,68 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
                     if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
                         return Drawable.Empty();
 
                     return new ArgonJudgementPiece(resultComponent.Component);
 
-                case TaikoSkinComponentLookup KatsudonComponent:
+                case KatsudonSkinComponentLookup katsudonComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
-                    switch (KatsudonComponent.Component)
+                    switch (katsudonComponent.Component)
                     {
-                        case TaikoSkinComponents.CentreHit:
+                        case KatsudonSkinComponents.CentreHit:
                             return new ArgonCentreCirclePiece();
 
-                        case TaikoSkinComponents.RimHit:
+                        case KatsudonSkinComponents.RimHit:
                             return new ArgonRimCirclePiece();
 
-                        case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                        case KatsudonSkinComponents.PlayfieldBackgroundLeft:
                             return new ArgonPlayfieldBackgroundLeft();
 
-                        case TaikoSkinComponents.PlayfieldBackgroundRight:
+                        case KatsudonSkinComponents.PlayfieldBackgroundRight:
                             return new ArgonPlayfieldBackgroundRight();
 
-                        case TaikoSkinComponents.InputDrum:
+                        case KatsudonSkinComponents.InputDrum:
                             return new ArgonInputDrum();
 
-                        case TaikoSkinComponents.HitTarget:
+                        case KatsudonSkinComponents.HitTarget:
                             return new ArgonHitTarget();
 
-                        case TaikoSkinComponents.BarLine:
+                        case KatsudonSkinComponents.BarLine:
                             return new ArgonBarLine();
 
-                        case TaikoSkinComponents.DrumRollBody:
+                        case KatsudonSkinComponents.DrumRollBody:
                             return new ArgonElongatedCirclePiece();
 
-                        case TaikoSkinComponents.DrumRollTick:
+                        case KatsudonSkinComponents.DrumRollTick:
                             return new ArgonTickPiece();
 
-                        case TaikoSkinComponents.TaikoExplosionKiai:
+                        case KatsudonSkinComponents.KatsudonExplosionKiai:
                             // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                             return Drawable.Empty().With(d => d.Expire());
 
-                        case TaikoSkinComponents.TaikoExplosionGreat:
-                        case TaikoSkinComponents.TaikoExplosionMiss:
-                        case TaikoSkinComponents.TaikoExplosionOk:
-                            return new ArgonHitExplosion(KatsudonComponent.Component);
+                        case KatsudonSkinComponents.DrumSamplePlayer:
+                            return new ArgonDrumSamplePlayer();
 
-                        case TaikoSkinComponents.Swell:
-                            return new ArgonSwellCirclePiece();
+                        case KatsudonSkinComponents.KatsudonExplosionGreat:
+                        case KatsudonSkinComponents.KatsudonExplosionMiss:
+                        case KatsudonSkinComponents.KatsudonExplosionOk:
+                            return new ArgonHitExplosion(katsudonComponent.Component);
+
+                        case KatsudonSkinComponents.Swell:
+                            return new ArgonSwell();
                     }
 
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }

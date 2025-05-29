@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -23,18 +22,5 @@ namespace osu.Game.Rulesets.Katsudon.Objects
         }
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();
-
-        public static KatsudonHitObject Convert(Taiko.Objects.BarLine barline, int playerId)
-        {
-            return new BarLine
-            {
-                HitWindows = barline.HitWindows,
-                LegacyBpmMultiplier = barline.LegacyBpmMultiplier,
-                Samples = barline.Samples,
-                StartTime = barline.StartTime,
-                Major = barline.Major,
-                PlayerId = playerId
-            };
-        }
     }
 }

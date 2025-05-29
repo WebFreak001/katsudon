@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,6 +20,8 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
+using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using osuTK;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.UI;
@@ -33,47 +36,54 @@ namespace osu.Game.Rulesets.Katsudon.UI
 
         public new KatsudonInputManager KeyBindingInputManager => (KatsudonInputManager)base.KeyBindingInputManager;
 
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
+        protected new KatsudonPlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => (KatsudonPlayfieldAdjustmentContainer)base.PlayfieldAdjustmentContainer;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public override bool AllowGameplayOverlays => false;
-
-        private SkinnableDrawable scroller;
+        private SkinnableDrawable? scroller;
 
         public DrawableKatsudonRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
+            VisualisationMethod = ScrollVisualisationMethod.Overlapping;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load(GameplayState? gameplayState)
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
-            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
-            {
-                RelativeSizeAxes = Axes.X,
-                Depth = float.MaxValue
-            });
+            var spriteElements = gameplayState?.Storyboard.Layers.Where(l => l.Name != @"Overlay")
+                                              .SelectMany(l => l.Elements)
+                                              .OfType<StoryboardSprite>()
+                                              .DistinctBy(e => e.Path) ?? Enumerable.Empty<StoryboardSprite>();
 
-            // KeyBindingInputManager.Add(new DrumTouchInputArea());
+            if (spriteElements.Count() < 10)
+            {
+                FrameStableComponents.Add(scroller = new SkinnableDrawable(new KatsudonSkinComponentLookup(-1, KatsudonSkinComponents.Scroller), _ => Empty())
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Depth = float.MaxValue,
+                });
+            }
         }
 
         protected override void Update()
         {
             base.Update();
 
-            // Katsudon scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
-            const float scroll_rate = 10;
+            TimeRange.Value = ComputeTimeRange();
+        }
 
-            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
-            // Width is used because it defines how many notes fit on the playfield.
-            // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
-            float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
-
-            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+        protected virtual double ComputeTimeRange()
+        {
+            // Using the constant algorithm results in a sluggish scroll speed that's equal to 60 BPM.
+            // We need to adjust it to the expected default scroll speed (BPM * base SV multiplier).
+            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Constant
+                ? (Beatmap.BeatmapInfo.BPM * Beatmap.Difficulty.SliderMultiplier) / 60
+                : 1;
+            return PlayfieldAdjustmentContainer.ComputeTimeRange() / multiplier;
         }
 
         protected override void UpdateAfterChildren()
@@ -81,7 +91,9 @@ namespace osu.Game.Rulesets.Katsudon.UI
             base.UpdateAfterChildren();
 
             var playfieldScreen = Playfield.ScreenSpaceDrawQuad;
-            scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
+
+            if (scroller != null)
+                scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
         }
 
         public MultiplierControlPoint ControlPointAt(double time)
@@ -92,7 +104,7 @@ namespace osu.Game.Rulesets.Katsudon.UI
             return ControlPoints[result];
         }
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new KatsudonPlayfieldAdjustmentContainer
         {
             LockPlayfieldAspectRange = { BindTarget = LockPlayfieldAspectRange }
         };
@@ -106,5 +118,7 @@ namespace osu.Game.Rulesets.Katsudon.UI
         // protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new KatsudonFramedReplayInputHandler(replay);
 
         // protected override ReplayRecorder CreateReplayRecorder(Score score) => new KatsudonReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
     }
 }

@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
 {
-    public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
         private RingExplosion? ringExplosion;
 
@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
             switch (Result)
             {
                 default:
-                    JudgementText.MoveToX(-0.6f)
-                                 .MoveToX(-1.0f, duration, Easing.OutQuint);
+                    JudgementText.MoveToY(-0.1f)
+                                 .MoveToY(-0.5f, duration, Easing.OutQuint);
 
                     JudgementText
                         .ScaleTo(Vector2.One)
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
                     this.ScaleTo(1, 100, Easing.In);
 
                     JudgementText.MoveTo(Vector2.Zero);
-                    JudgementText.MoveToOffset(new Vector2(50, 0), duration, Easing.InQuint);
+                    JudgementText.MoveToOffset(new Vector2(0, 100), duration, Easing.InQuint);
 
                     this.RotateTo(0);
                     this.RotateTo(40, duration, Easing.InQuint);

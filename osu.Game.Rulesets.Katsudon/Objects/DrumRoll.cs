@@ -1,21 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Katsudon.Beatmaps;
 using osuTK;
-using System;
 
 namespace osu.Game.Rulesets.Katsudon.Objects
 {
-    public class DrumRoll : KatsudonStrongableHitObject, IHasPath, IHasSliderVelocity
+    public class DrumRoll : KatsudonStrongableHitObject, IHasPath
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -35,19 +33,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects
         /// </summary>
         public double Velocity { get; private set; }
 
-        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
-        {
-            Precision = 0.01,
-            MinValue = 0.1,
-            MaxValue = 10
-        };
-
-        public double SliderVelocity
-        {
-            get => SliderVelocityBindable.Value;
-            set => SliderVelocityBindable.Value = value;
-        }
-
         /// <summary>
         /// Numer of ticks per beat length.
         /// </summary>
@@ -64,8 +49,9 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * SliderVelocity;
+            double scoringDistance = base_distance * (difficulty.SliderMultiplier * KatsudonBeatmapConverter.VELOCITY_MULTIPLIER) * effectPoint.ScrollSpeed;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             TickRate = difficulty.SliderTickRate == 3 ? 3 : 4;
@@ -91,13 +77,14 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                AddNested(new DrumRollTick
+                AddNested(new DrumRollTick(this)
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
-                    Samples = Samples
+                    Samples = Samples,
+                    PlayerId = PlayerId
                 });
 
                 first = false;
@@ -119,12 +106,10 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             var ret = new DrumRoll
             {
                 HitWindows = drumRoll.HitWindows,
-                LegacyBpmMultiplier = drumRoll.LegacyBpmMultiplier,
                 Samples = drumRoll.Samples,
                 StartTime = drumRoll.StartTime,
                 Duration = drumRoll.Duration,
                 Velocity = drumRoll.Velocity,
-                SliderVelocity = drumRoll.SliderVelocity,
                 TickRate = drumRoll.TickRate,
                 IsStrong = drumRoll.IsStrong,
                 PlayerId = playerId
@@ -155,7 +140,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects
         double IHasDistance.Distance => Duration * Velocity;
 
         SliderPath IHasPath.Path
-            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
+            => new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / KatsudonBeatmapConverter.VELOCITY_MULTIPLIER);
 
         #endregion
     }

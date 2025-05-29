@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -84,7 +83,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             return new Hit
             {
                 HitWindows = hit.HitWindows,
-                LegacyBpmMultiplier = hit.LegacyBpmMultiplier,
                 Samples = hit.Samples,
                 StartTime = hit.StartTime,
                 IsStrong = hit.IsStrong,

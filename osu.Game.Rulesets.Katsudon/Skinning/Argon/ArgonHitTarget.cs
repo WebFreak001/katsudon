@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
         public ArgonHitTarget()
         {
             RelativeSizeAxes = Axes.Both;
-            Masking = false;
+            Masking = true;
 
             const float border_thickness = 4f;
 
@@ -26,57 +26,42 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
             {
                 new Circle
                 {
-                    Name = "Outer circle P1",
+                    Name = "Bar Upper",
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.1f,
-                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE),
-                    Masking = true,
+                    Origin = Anchor.TopCentre,
+                    Y = -border_thickness,
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(border_thickness, (1 - KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE)),
                 },
                 new Circle
                 {
-                    Name = "Inner circle P1",
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.1f,
-                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE * 0.85f),
-                    Masking = true,
-                },
-                new Circle
-                {
-                    Name = "Outer circle P2",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.1f,
-                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE),
-                    Masking = true,
-                },
-                new Circle
-                {
-                    Name = "Inner circle P2",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.1f,
-                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE * 0.85f),
-                    Masking = true,
-                },
-                new Circle
-                {
-                    Name = "Bar Middle",
+                    Name = "Outer circle",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.1f,
+                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE),
+                    Masking = true,
+                },
+                new Circle
+                {
+                    Name = "Inner circle",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.1f,
+                    Size = new Vector2(KatsudonHitObject.DEFAULT_SIZE * 0.85f),
+                    Masking = true,
+                },
+                new Circle
+                {
+                    Name = "Bar Lower",
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Y,
                     Y = border_thickness,
                     Size = new Vector2(border_thickness, (1 - KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE)),

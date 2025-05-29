@@ -15,21 +15,14 @@ namespace osu.Game.Rulesets.Katsudon.UI
     /// </summary>
     internal partial class InputDrum : Container
     {
-        public InputDrum()
-        {
-            AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.InputDrum), _ => new DefaultInputDrum())
+                new SkinnableDrawable(new KatsudonSkinComponentLookup(-1, KatsudonSkinComponents.InputDrum), _ => new DefaultInputDrum())
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }

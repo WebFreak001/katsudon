@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            AddInternal(new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.BarLine), _ => new DefaultBarLine())
+            AddInternal(new SkinnableDrawable(new KatsudonSkinComponentLookup(HitObject?.PlayerId ?? -1, KatsudonSkinComponents.BarLine), _ => new DefaultBarLine())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

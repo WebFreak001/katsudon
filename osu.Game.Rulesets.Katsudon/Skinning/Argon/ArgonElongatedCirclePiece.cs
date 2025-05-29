@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Argon
         protected override void Update()
         {
             base.Update();
-            Width = Parent.DrawSize.X + DrawHeight;
+            Width = Parent!.DrawSize.X + DrawHeight;
         }
     }
 }

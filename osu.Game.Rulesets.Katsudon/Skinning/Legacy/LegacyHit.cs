@@ -10,9 +10,9 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
 {
     public partial class LegacyHit : LegacyCirclePiece
     {
-        private readonly TaikoSkinComponents component;
+        private readonly KatsudonSkinComponents component;
 
-        public LegacyHit(TaikoSkinComponents component)
+        public LegacyHit(KatsudonSkinComponents component)
         {
             this.component = component;
         }
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Katsudon.Skinning.Legacy
         private void load()
         {
             AccentColour = LegacyColourCompatibility.DisallowZeroAlpha(
-                component == TaikoSkinComponents.CentreHit
+                component == KatsudonSkinComponents.CentreHit
                     ? new Color4(235, 69, 44, 255)
                     : new Color4(67, 142, 172, 255));
         }

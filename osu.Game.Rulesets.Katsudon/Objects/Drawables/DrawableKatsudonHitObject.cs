@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
                 },
                 proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
             });
-            
+
             OnNewResult += ForwardTwoPlayerResult;
             OnRevertResult += RevertTwoPlayerResult;
         }
@@ -165,7 +165,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 
         public new TObject HitObject => (TObject)base.HitObject;
 
-        protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
         protected DrawableKatsudonHitObject([CanBeNull] TObject hitObject)
@@ -190,14 +189,16 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 
         protected virtual void RecreatePieces()
         {
-            Size = BaseSize = new Vector2(KatsudonHitObject.DEFAULT_SIZE);
-
             if (MainPiece != null)
                 Content.Remove(MainPiece, true);
 
-            Content.Add(MainPiece = CreateMainPiece());
+            MainPiece = CreateMainPiece();
+
+            if (MainPiece != null)
+                Content.Add(MainPiece);
         }
 
+        [CanBeNull]
         protected abstract SkinnableDrawable CreateMainPiece();
     }
 }

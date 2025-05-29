@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
@@ -16,7 +15,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             return new SwellTick
             {
                 HitWindows = swellTick.HitWindows,
-                LegacyBpmMultiplier = swellTick.LegacyBpmMultiplier,
                 Samples = swellTick.Samples,
                 StartTime = swellTick.StartTime,
                 PlayerId = -1

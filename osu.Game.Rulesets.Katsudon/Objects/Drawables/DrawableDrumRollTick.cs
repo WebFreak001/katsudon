@@ -8,11 +8,12 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Katsudon.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko;
-using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new KatsudonSkinComponentLookup(HitObject.PlayerId, KatsudonSkinComponents.DrumRollTick), _ => new TickPiece());
 
         protected override void OnApply()
         {
@@ -45,19 +46,25 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             IsFirstTick.Value = HitObject.FirstTick;
         }
 
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            Size = new Vector2(HitObject.IsStrong ? KatsudonStrongableHitObject.DEFAULT_STRONG_SIZE : KatsudonHitObject.DEFAULT_SIZE);
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (timeOffset > HitObject.HitWindow)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                 return;
             }
 
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyMaxResult();
         }
 
         public override void OnKilled()
@@ -65,7 +72,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
             base.OnKilled();
 
             if (Time.Current > HitObject.GetEndTime() && !Judged)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -113,15 +120,11 @@ namespace osu.Game.Rulesets.Katsudon.Objects.Drawables
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-
-            public override void OnKilled()
-            {
-                base.OnKilled();
-
-                if (Time.Current > ParentHitObject.HitObject.GetEndTime() && !Judged)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyResult(static (r, hitObject) =>
+                {
+                    var nestedHit = (StrongNestedHit)hitObject;
+                    r.Type = nestedHit.ParentHitObject!.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                });
             }
 
             public override bool OnPressed(KeyBindingPressEvent<KatsudonAction> e) => false;

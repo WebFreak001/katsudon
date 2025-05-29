@@ -54,5 +54,33 @@ namespace osu.Game.Rulesets.Katsudon
         {
             return (KatsudonAction)(((int)action % 4) + playerNo * 4);
         }
+
+        public static bool IsCentre(this KatsudonAction action)
+        {
+            switch (action)
+            {
+                case KatsudonAction.P1_LeftCentre:
+                case KatsudonAction.P2_LeftCentre:
+                case KatsudonAction.P1_RightCentre:
+                case KatsudonAction.P2_RightCentre:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsRim(this KatsudonAction action)
+        {
+            switch (action)
+            {
+                case KatsudonAction.P1_LeftRim:
+                case KatsudonAction.P2_LeftRim:
+                case KatsudonAction.P1_RightRim:
+                case KatsudonAction.P2_RightRim:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

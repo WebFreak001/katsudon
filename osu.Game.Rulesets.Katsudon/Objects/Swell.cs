@@ -3,12 +3,12 @@
 
 #nullable disable
 
+using System;
 using System.Threading;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
-using System;
 
 namespace osu.Game.Rulesets.Katsudon.Objects
 {
@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Katsudon.Objects
                 cancellationToken.ThrowIfCancellationRequested();
                 AddNested(new SwellTick
                 {
+                    StartTime = StartTime,
                     Samples = Samples
                 });
             }
@@ -50,7 +51,6 @@ namespace osu.Game.Rulesets.Katsudon.Objects
             return new Swell
             {
                 HitWindows = swell.HitWindows,
-                LegacyBpmMultiplier = swell.LegacyBpmMultiplier,
                 Samples = swell.Samples,
                 StartTime = swell.StartTime,
                 Duration = swell.Duration,
