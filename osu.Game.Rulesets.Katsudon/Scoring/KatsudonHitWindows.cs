@@ -3,18 +3,21 @@
 
 #nullable disable
 
+using System;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Katsudon.Scoring
 {
     public class KatsudonHitWindows : HitWindows
     {
-        private static readonly DifficultyRange[] taiko_ranges =
-        {
-            new DifficultyRange(HitResult.Great, 50, 35, 20),
-            new DifficultyRange(HitResult.Ok, 120, 80, 50),
-            new DifficultyRange(HitResult.Miss, 135, 95, 70),
-        };
+        public static readonly DifficultyRange GREAT_WINDOW_RANGE = new DifficultyRange(50, 35, 20);
+        public static readonly DifficultyRange OK_WINDOW_RANGE = new DifficultyRange(120, 80, 50);
+        public static readonly DifficultyRange MISS_WINDOW_RANGE = new DifficultyRange(135, 95, 70);
+
+        private double great;
+        private double ok;
+        private double miss;
 
         public override bool IsHitResultAllowed(HitResult result)
         {
@@ -29,6 +32,29 @@ namespace osu.Game.Rulesets.Katsudon.Scoring
             return false;
         }
 
-        protected override DifficultyRange[] GetRanges() => taiko_ranges;
+        public override void SetDifficulty(double difficulty)
+        {
+            great = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, GREAT_WINDOW_RANGE)) - 0.5;
+            ok = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, OK_WINDOW_RANGE)) - 0.5;
+            miss = Math.Floor(IBeatmapDifficultyInfo.DifficultyRange(difficulty, MISS_WINDOW_RANGE)) - 0.5;
+        }
+
+        public override double WindowFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Great:
+                    return great;
+
+                case HitResult.Ok:
+                    return ok;
+
+                case HitResult.Miss:
+                    return miss;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(result), result, null);
+            }
+        }
     }
 }
